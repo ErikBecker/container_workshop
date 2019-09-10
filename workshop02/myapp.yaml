@@ -1,0 +1,11 @@
+---
+kind: Namespace
+apiVersion: v1 #only for core else <section>/v1
+
+metadata:
+  name: myns
+  labels:
+    app: myapp
+
+
+#spec:

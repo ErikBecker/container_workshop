@@ -1,0 +1,50 @@
+#PULL stackupiss/northwind-db:v1 DOCKER IMAGE
+docker pull stackupiss/northwind-db:v1
+
+# RUN CONTAINER WITH mydb AS NAME
+docker run -d --name=mydb stackupiss/northwind-db:v1
+
+# WRITE DOCKERFILE TO BUILD myapp IMAGE
+./workshop01/cfdsa/northwind/server/Dockerfile
+
+# BUILD DOCKER IMAGE myapp
+docker build -t myapp .
+
+# STOP AND REMOVE mydb
+docker stop mydb
+docker rm mydb
+
+# CREATE NETWORK mynet
+docker create network mynet
+docker network ls
+
+# START mydb IN mynet
+docker run -d --network=mynet --name=mydb stackupiss/northwind-db:v1
+
+# START myapp IN mynet ALSO PORT BIND AND LINK ENV VARIABLES WITH SENSITIVE INFORMATION
+docker run -d -e DB_USER=root -e DB_PASSWORD=changeit -p 3000:3000 --network=mynet --name=myapp myapp
+
+# VERIFY CONTAINERS ARE IN NETWORK 
+docker network inspect mynet
+
+# STOP AND REMOVE mydb
+docker stop mydb myapp
+docker rm mydb myapp
+
+# CREATE A VOLUME
+docker volume create myvol
+
+# FIND mydb VOLUME DIRECTORY FROM DOCKERFILE OR,
+docker history stackupiss/northwind-db:v1
+
+# ATTACH VOLUME TO mydb
+docker run -d -v myvol:/var/lib/mysql --network=mynet --name=mydb stackupiss/northwind-db:v1
+
+# RUN APP
+docker run -d -e DB_USER=root -e DB_PASSWORD=changeit -p 3000:3000 --network=mynet --name=myapp myapp
+
+
+
+# write docker-compose.yml
+docker-compose up
+docker-compose down
